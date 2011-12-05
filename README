@@ -1,0 +1,11 @@
+Short explanation if you end up here for some weird reason.
+
+We wanted the list of Debian package versions identified by Debian as
+fixing vulnerabilities.
+This very dirty hack parses (very poorly) the Debian OVAL file and turns
+(some of) the data into yummy JSON.
+
+The resulting file cannot in any way be treated as an authorative or
+reliable source of information.
+Neither my employers, present, past or future, nor I, will ever take any
+responsibility for any direct or indirect use of this tool.

@@ -2,11 +2,7 @@ package potatoCVE;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Objects;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -38,9 +34,9 @@ public class DebianPotatoDocument extends HashSet<DebianPotatoDocument.CVEInform
             if (n instanceof Element) {
                 Element e = (Element) n;
                 String name = e.getTagName();
-                if(name.equals("definitions"))
+                if (name.equals("definitions"))
                     defsElem = e;
-                else if(name.equals("tests"))
+                else if (name.equals("tests"))
                     testsElem = e;
                 else if (name.equals("objects"))
                     objectsElem = e;
@@ -49,7 +45,7 @@ public class DebianPotatoDocument extends HashSet<DebianPotatoDocument.CVEInform
             }
         }
 
-        if(defsElem == null ||
+        if (defsElem == null ||
                 testsElem == null ||
                 objectsElem == null ||
                 statesElem == null) {
@@ -101,8 +97,8 @@ public class DebianPotatoDocument extends HashSet<DebianPotatoDocument.CVEInform
         for (int i = 0; i < tests.getLength(); i++) {
             Element test = (Element) tests.item(i);
             String id = test.getAttribute("id");
-            String object_id = ((Element)test.getElementsByTagName("object").item(0)).getAttribute("object_ref");
-            String state_id = ((Element)test.getElementsByTagName("state").item(0)).getAttribute("state_ref");
+            String object_id = ((Element) test.getElementsByTagName("object").item(0)).getAttribute("object_ref");
+            String state_id = ((Element) test.getElementsByTagName("state").item(0)).getAttribute("state_ref");
             result.put(id, new VersionInformation(packages.get(object_id), versions.get(state_id)));
         }
         return result;
@@ -112,7 +108,7 @@ public class DebianPotatoDocument extends HashSet<DebianPotatoDocument.CVEInform
         NodeList defs = defElement.getElementsByTagName("definition");
         for (int i = 0; i < defs.getLength(); i++) {
             Element def = (Element) defs.item(i);
-            if(!def.getAttribute("class").equals("vulnerability"))
+            if (!def.getAttribute("class").equals("vulnerability"))
                 continue;
 
             String id = def.getAttribute("id");
@@ -122,7 +118,7 @@ public class DebianPotatoDocument extends HashSet<DebianPotatoDocument.CVEInform
             for (int j = 0; j < refs.getLength(); j++) {
                 Element ref = (Element) refs.item(j);
                 String ref_id = ref.getAttribute("ref_id");
-                if(ref_id.matches("CVE-[0-9-]+")) {
+                if (ref_id.matches("CVE-[0-9-]+")) {
                     cves.add(ref_id);
                 }
             }
@@ -131,10 +127,10 @@ public class DebianPotatoDocument extends HashSet<DebianPotatoDocument.CVEInform
             NodeList criteria = def.getElementsByTagName("criterion");
             for (int j = 0; j < criteria.getLength(); j++) {
                 Element criterion = (Element) criteria.item(j);
-                if(!criterion.hasAttribute("test_ref"))
+                if (!criterion.hasAttribute("test_ref"))
                     continue;
                 String test_ref = criterion.getAttribute("test_ref");
-                if(!tests.containsKey(test_ref))
+                if (!tests.containsKey(test_ref))
                     continue;
                 constraints.add(tests.get(test_ref));
             }
