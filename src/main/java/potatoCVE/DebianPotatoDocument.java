@@ -62,74 +62,74 @@ public class DebianPotatoDocument extends HashSet<DebianPotatoDocument.CVEInform
         this.loadDefinitions(defsElem, tests);
     }
 
-    static private LinkedHashMap<String, String> loadPackages(Element objectsElem) {
-        LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
-        NodeList objects = objectsElem.getChildNodes();
-        NodeList packages = objectsElem.getElementsByTagName("dpkginfo_object");
+    static private LinkedHashMap<String, String> loadPackages(final Element objectsElem) {
+        final LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
+        final NodeList objects = objectsElem.getChildNodes();
+        final NodeList packages = objectsElem.getElementsByTagName("dpkginfo_object");
         for (int i = 0; i < packages.getLength(); i++) {
-            Element e = (Element) packages.item(i);
-            String id = e.getAttribute("id");
-            String text = CharMatcher.WHITESPACE.trimFrom(e.getTextContent());
+            final Element e = (Element) packages.item(i);
+            final String id = e.getAttribute("id");
+            final String text = CharMatcher.WHITESPACE.trimFrom(e.getTextContent());
             result.put(id, text);
         }
         return result;
     }
 
-    static private LinkedHashMap<String, String> loadVersions(Element statesElem) {
-        LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
-        NodeList versions = statesElem.getElementsByTagName("dpkginfo_state");
+    static private LinkedHashMap<String, String> loadVersions(final Element statesElem) {
+        final LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
+        final NodeList versions = statesElem.getElementsByTagName("dpkginfo_state");
         for (int i = 0; i < versions.getLength(); i++) {
-            Element state = (Element) versions.item(i);
-            String id = state.getAttribute("id");
-            String text = CharMatcher.WHITESPACE.trimFrom(state.getTextContent());
+            final Element state = (Element) versions.item(i);
+            final String id = state.getAttribute("id");
+            final String text = CharMatcher.WHITESPACE.trimFrom(state.getTextContent());
             result.put(id, text);
         }
         return result;
     }
 
     static private LinkedHashMap<String, VersionInformation> loadTests(
-            Element testsElem,
-            Map<String, String> packages,
-            Map<String, String> versions) {
+            final Element testsElem,
+            final Map<String, String> packages,
+            final Map<String, String> versions) {
         LinkedHashMap<String, VersionInformation> result =
                 new LinkedHashMap<String, VersionInformation>();
-        NodeList tests = testsElem.getElementsByTagName("dpkginfo_test");
+        final NodeList tests = testsElem.getElementsByTagName("dpkginfo_test");
         for (int i = 0; i < tests.getLength(); i++) {
-            Element test = (Element) tests.item(i);
-            String id = test.getAttribute("id");
-            String object_id = ((Element) test.getElementsByTagName("object").item(0)).getAttribute("object_ref");
-            String state_id = ((Element) test.getElementsByTagName("state").item(0)).getAttribute("state_ref");
+            final Element test = (Element) tests.item(i);
+            final String id = test.getAttribute("id");
+            final String object_id = ((Element) test.getElementsByTagName("object").item(0)).getAttribute("object_ref");
+            final String state_id = ((Element) test.getElementsByTagName("state").item(0)).getAttribute("state_ref");
             result.put(id, new VersionInformation(packages.get(object_id), versions.get(state_id)));
         }
         return result;
     }
 
-    private void loadDefinitions(Element defElement, Map<String, VersionInformation> tests) {
-        NodeList defs = defElement.getElementsByTagName("definition");
+    private void loadDefinitions(final Element defElement, final Map<String, VersionInformation> tests) {
+        final NodeList defs = defElement.getElementsByTagName("definition");
         for (int i = 0; i < defs.getLength(); i++) {
-            Element def = (Element) defs.item(i);
+            final Element def = (Element) defs.item(i);
             if (!def.getAttribute("class").equals("vulnerability"))
                 continue;
 
-            String id = def.getAttribute("id");
+            final String id = def.getAttribute("id");
 
-            ArrayList<String> cves = new ArrayList<String>();
-            NodeList refs = def.getElementsByTagName("reference");
+            final ArrayList<String> cves = new ArrayList<String>();
+            final NodeList refs = def.getElementsByTagName("reference");
             for (int j = 0; j < refs.getLength(); j++) {
-                Element ref = (Element) refs.item(j);
-                String ref_id = ref.getAttribute("ref_id");
+                final Element ref = (Element) refs.item(j);
+                final String ref_id = ref.getAttribute("ref_id");
                 if (ref_id.matches("CVE-[0-9-]+")) {
                     cves.add(ref_id);
                 }
             }
 
             Set<VersionInformation> constraints = new HashSet<VersionInformation>();
-            NodeList criteria = def.getElementsByTagName("criterion");
+            final NodeList criteria = def.getElementsByTagName("criterion");
             for (int j = 0; j < criteria.getLength(); j++) {
-                Element criterion = (Element) criteria.item(j);
+                final Element criterion = (Element) criteria.item(j);
                 if (!criterion.hasAttribute("test_ref"))
                     continue;
-                String test_ref = criterion.getAttribute("test_ref");
+                final String test_ref = criterion.getAttribute("test_ref");
                 if (!tests.containsKey(test_ref))
                     continue;
                 constraints.add(tests.get(test_ref));
@@ -143,7 +143,7 @@ public class DebianPotatoDocument extends HashSet<DebianPotatoDocument.CVEInform
         final String name;
         final String version;
 
-        VersionInformation(String name, String version) {
+        VersionInformation(final String name, final String version) {
             this.name = name;
             this.version = version;
         }
@@ -165,11 +165,11 @@ public class DebianPotatoDocument extends HashSet<DebianPotatoDocument.CVEInform
     }
 
     public static class CVEInformation {
-        String id;
-        ArrayList<String> cves;
-        Set<VersionInformation> constraints;
+        final String id;
+        final ArrayList<String> cves;
+        final Set<VersionInformation> constraints;
 
-        CVEInformation(String id, ArrayList<String> cves, Set<VersionInformation> constraints) {
+        CVEInformation(final String id, final ArrayList<String> cves, final Set<VersionInformation> constraints) {
             this.id = id;
             this.cves = cves;
             this.constraints = constraints;
